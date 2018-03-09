@@ -1,0 +1,34 @@
+{-# LANGUAGE FlexibleContexts #-}
+import Data.Image.Boxed hiding (label, dinstanceTransform)
+import Data.Image.Interactive
+import Data.Image.Internal 
+import Data.Image.Binary
+
+rotateImage :: ColorImage -> Int -> ColorImage
+rotateImage img deg = makeImage rows cols (\r c -> let x' = c - xCent
+                                                       y' = r - yCent
+                                                       x'' = (fromIntegral $ x') * (cos rad) - (fromIntegral $ y') * (sin rad)
+                                                       y'' = (fromIntegral $ x') * (sin rad) + (fromIntegral $ y') * (cos rad) in
+                                                     if (floor x'') + xCent > 0 && (floor x'') + xCent <= cols &&
+                                                     (floor y'') + yCent > 0 && (floor y'') + yCent <= rows then ref img ((floor y'') + yCent - 1) ((floor x'') + xCent - 1) else 0)
+  where (rows, cols) = dimensions img
+        rad = (fromIntegral deg) * ((pi :: Double)/ 180)
+        xCent = cols `div` 2
+        yCent = rows `div` 2
+
+coneToPanorama :: ColorImage -> ColorImage
+coneToPanorama img = makeImage center width (\r c -> let theta = 2 * (pi :: Double) * ((fromIntegral c) / (fromIntegral width))
+                                                         x = floor $ (fromIntegral center) + (fromIntegral r) * (cos theta)
+                                                         y = floor $ (fromIntegral center) + (fromIntegral r) * (sin theta) in ref img x y)
+  where (rows, cols) = dimensions img
+        center = cols `div` 2
+        width = floor $ 2 * (pi :: Double) * (fromIntegral center)
+
+main = do
+ -- mona <- readColorImage "louvre-small.ppm"
+ -- display mona
+ -- putStrLn "Test"
+  cone <- readColorImage "cone-mirror.ppm"
+  display cone
+  let coneP = coneToPanorama cone
+  display coneP
