@@ -1,0 +1,8 @@
+{-# LANGUAGE FlexibleContexts #-}
+import Data.Image.Boxed hiding (label, dinstanceTransform)
+import Data.Image.Interactive
+import Data.Image.Internal 
+import Data.Image.Binary
+
+main = do
+  putStrLn "Test"
